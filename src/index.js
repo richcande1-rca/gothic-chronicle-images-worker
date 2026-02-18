@@ -140,45 +140,29 @@ export default {
       });
     }
 
-   // 4) Image endpoint (stub)
-// GET /api/image/<id>.png
+// 4) Image endpoint (REAL IMAGE)
 else if (method === "GET" && url.pathname.startsWith("/api/image/")) {
-  const id = url.pathname.split("/").pop() || "unknown";
 
-  const svg =
-`<svg xmlns="http://www.w3.org/2000/svg" width="768" height="768">
-  <rect width="100%" height="100%" fill="#0b0b0d"/>
-  <text x="50%" y="50%" fill="#c7b28a" font-family="Georgia, serif" font-size="20" text-anchor="middle">
-    Gothic Chronicle (stub)
-  </text>
-  <text x="50%" y="56%" fill="#b8b0a5" font-family="ui-monospace, monospace" font-size="12" text-anchor="middle">
-    ${String(id).replace(/[<>&'"]/g, c => ({ "<":"&lt;", ">":"&gt;", "&":"&amp;", "'":"&apos;", '"':"&quot;" }[c]))}
-  </text>
-</svg>`;
+  const room = (url.searchParams.get("room") || "gothic estate").trim();
+  const state = (url.searchParams.get("state") || "").trim();
 
-  response = new Response(svg, {
-    status: 200,
-    headers: { "Content-Type": "image/svg+xml; charset=utf-8" },
+  const prompt =
+    `Ultra realistic cinematic gothic horror, Transylvania 2026. ` +
+    `Scene: ${room}. Fog, moonlight, ancient stone, dramatic shadows. ` +
+    `High detail, cinematic lighting, moody atmosphere. ` +
+    `No text, no watermark, no modern objects. ` +
+    (state ? `Story tone: ${state}.` : "");
+
+  const image = await env.AI.run("@cf/leonardo/phoenix-1.0", {
+    prompt
+  });
+
+  response = new Response(image, {
+    headers: {
+      "Content-Type": "image/jpg"
+    }
   });
 }
-
-    // Not found
-    else {
-      response = json(
-        {
-          ok: false,
-          error: "Not found",
-          hint: "Try GET /health or POST /api/generate",
-          path: url.pathname,
-          method,
-        },
-        404
-      );
-    }
-
-    return withCors(response, origin);
-  },
-};
 
 function withCors(response, origin) {
   const h = new Headers(response.headers);
