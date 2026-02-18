@@ -60,26 +60,34 @@ export default {
       response = json({ ok: true, service: "gothic-chronicle-images", ts: Date.now() });
     }
 
-			  // 2.5) Front-end convenience: direct image URL for <img>
-    // GET /image?room=gate&seed=gate
-    else if (method === "GET" && url.pathname === "/image") {
-      const room = (url.searchParams.get("room") || "").trim();
-      const seed = (url.searchParams.get("seed") || room).trim();
+			 else if (method === "GET" && url.pathname === "/image") {
+  const room  = (url.searchParams.get("room") || "").trim();
+  const seed  = (url.searchParams.get("seed") || room).trim();
+  const state = (url.searchParams.get("state") || "").trim(); // <-- ADD THIS
 
-      if (!room) {
-        response = json({ ok: false, error: "Missing ?room=" }, 400);
-        return withCors(response, origin);
-      }
+  if (!room) {
+    response = json({ ok: false, error: "Missing ?room=" }, 400);
+    return withCors(response, origin);
+  }
 
-      // Keep payload deterministic and compatible with future generator
-      const payload = {
-        type: "scene_room",
-        prompt: `Room: ${room}. Seed: ${seed}.`, // stub prompt for now
-        seed: 0,
-        w: 768,
-        h: 768,
-        variant: "v1",
-      };
+  const payload = {
+    type: "scene_room",
+    prompt: `Room: ${room}. Seed: ${seed}.`, // stub prompt for now
+    state,                                   // <-- ADD THIS
+    seed: 0,
+    w: 768,
+    h: 768,
+    variant: "v1",
+  };
+
+  const imageId = "img_" + (await sha256Hex(JSON.stringify(payload)));
+  const imageUrl = `${url.origin}/api/image/${imageId}.png`;
+
+  response = new Response(null, {
+    status: 302,
+    headers: { Location: imageUrl },
+  });
+}
 
       const imageId = "img_" + (await sha256Hex(JSON.stringify(payload)));
       const imageUrl = `${url.origin}/api/image/${imageId}.png`;
