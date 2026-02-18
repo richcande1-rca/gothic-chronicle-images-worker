@@ -132,16 +132,27 @@ export default {
       });
     }
 
-    // 4) Image endpoint (stub)
-    // GET /api/image/<id>.png
-    else if (method === "GET" && url.pathname.startsWith("/api/image/")) {
-      // For now, return a simple text response so you can confirm wiring.
-      // Later this becomes: fetch from R2 and stream image/png.
-      response = new Response("Image not generated yet (stub).", {
-        status: 200,
-        headers: { "Content-Type": "text/plain; charset=utf-8" },
-      });
-    }
+   // 4) Image endpoint (stub)
+// GET /api/image/<id>.png
+else if (method === "GET" && url.pathname.startsWith("/api/image/")) {
+  const id = url.pathname.split("/").pop() || "unknown";
+
+  const svg =
+`<svg xmlns="http://www.w3.org/2000/svg" width="768" height="768">
+  <rect width="100%" height="100%" fill="#0b0b0d"/>
+  <text x="50%" y="50%" fill="#c7b28a" font-family="Georgia, serif" font-size="20" text-anchor="middle">
+    Gothic Chronicle (stub)
+  </text>
+  <text x="50%" y="56%" fill="#b8b0a5" font-family="ui-monospace, monospace" font-size="12" text-anchor="middle">
+    ${String(id).replace(/[<>&'"]/g, c => ({ "<":"&lt;", ">":"&gt;", "&":"&amp;", "'":"&apos;", '"':"&quot;" }[c]))}
+  </text>
+</svg>`;
+
+  response = new Response(svg, {
+    status: 200,
+    headers: { "Content-Type": "image/svg+xml; charset=utf-8" },
+  });
+}
 
     // Not found
     else {
