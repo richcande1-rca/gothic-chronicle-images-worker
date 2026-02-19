@@ -139,32 +139,61 @@ export default {
       );
     }
 
-    // =====================
-    // REAL IMAGE GENERATION
-    // =====================
-    if (method === "GET" && url.pathname.startsWith("/api/image/")) {
+  // =====================
+// REAL IMAGE GENERATION
+// =====================
+if (method === "GET" && url.pathname.startsWith("/api/image/")) {
 
-      const room = (url.searchParams.get("room") || "gothic estate").trim();
-      const state = (url.searchParams.get("state") || "").trim();
+  const room = (url.searchParams.get("room") || "gothic estate").trim();
+  const state = (url.searchParams.get("state") || "").trim();
 
-      const prompt =
-        `Ultra realistic cinematic gothic horror, Transylvania 2026. ` +
-        `Scene: ${room}. Fog, moonlight, ancient stone, dramatic shadows. ` +
-        `High detail, cinematic lighting, moody atmosphere. ` +
-        `No text, no watermark, no modern objects. ` +
-        (state ? `Story tone: ${state}.` : "");
+  const prompt =
+    `Ultra realistic cinematic gothic horror, Transylvania 2026. ` +
+    `Scene: ${room}. Fog, moonlight, ancient stone, dramatic shadows. ` +
+    `High detail, cinematic lighting, moody atmosphere. ` +
+    `No text, no watermark, no modern objects. ` +
+    (state ? `Story tone: ${state}.` : "");
 
-      const image = await env.AI.run("@cf/leonardo/phoenix-1.0", {
-        prompt
-      });
+  try {
 
+    // 🔎 Check AI binding exists
+    if (!env.AI) {
       return withCors(
-        new Response(image,{
-          headers:{ "Content-Type":"image/jpeg" }
-        }),
+        json({
+          ok: false,
+          error: "AI binding missing (env.AI undefined)"
+        }, 500),
         origin
       );
     }
+
+    const result = await env.AI.run("@cf/leonardo/phoenix-1.0", {
+      prompt
+    });
+
+    // Some CF models return raw bytes, some return objects — handle both
+    const imageData = result?.image || result;
+
+    return withCors(
+      new Response(imageData, {
+        headers: { "Content-Type": "image/jpeg" }
+      }),
+      origin
+    );
+
+  } catch (err) {
+
+    return withCors(
+      json({
+        ok: false,
+        error: "Image generation failed",
+        detail: String(err?.message || err),
+        hasAI: !!env.AI
+      }, 500),
+      origin
+    );
+  }
+}
 
     // =====================
     // FALLBACK
