@@ -151,13 +151,24 @@ export default {
       );
     }
 
-  // =====================
-// REAL IMAGE GENERATION
+// =====================
+// REAL IMAGE GENERATION (DETERMINISTIC + CACHED)
 // =====================
 if (method === "GET" && url.pathname.startsWith("/api/image/")) {
 
   const room = (url.searchParams.get("room") || "gothic estate").trim();
   const state = (url.searchParams.get("state") || "").trim();
+  const seedParam = (url.searchParams.get("seed") || room).trim();
+
+  // Cache key = full request URL (includes room/state/seed + /api/image/<id>.jpg)
+  const cacheKey = new Request(url.toString(), { method: "GET" });
+  const cache = caches.default;
+
+  // 1) Try cache first
+  const cached = await cache.match(cacheKey);
+  if (cached) {
+    return withCors(cached, origin);
+  }
 
   const prompt =
     `Ultra realistic cinematic gothic horror, Transylvania 2026. ` +
@@ -167,34 +178,41 @@ if (method === "GET" && url.pathname.startsWith("/api/image/")) {
     (state ? `Story tone: ${state}.` : "");
 
   try {
-
-    // 🔎 Check AI binding exists
     if (!env.AI) {
       return withCors(
-        json({
-          ok: false,
-          error: "AI binding missing (env.AI undefined)"
-        }, 500),
+        json({ ok: false, error: "AI binding missing (env.AI undefined)" }, 500),
         origin
       );
     }
 
+    // 2) Deterministic seed (stable for same room+state+seedParam)
+    const seed = await seedFromText(`${room}::${state}::${seedParam}`);
+
+    // 3) Generate
     const result = await env.AI.run("@cf/leonardo/phoenix-1.0", {
-      prompt
+      prompt,
+      // If the model supports seed, this helps consistency.
+      // If ignored, caching still prevents re-gen for same URL.
+      seed
     });
 
-    // Some CF models return raw bytes, some return objects — handle both
     const imageData = result?.image || result;
 
-    return withCors(
-      new Response(imageData, {
-        headers: { "Content-Type": "image/jpeg" }
-      }),
-      origin
-    );
+    const response = new Response(imageData, {
+      status: 200,
+      headers: {
+        "Content-Type": "image/jpeg",
+        // Tell browsers/CDN this is safe to reuse for a long time
+        "Cache-Control": "public, max-age=31536000, immutable",
+      }
+    });
+
+    // 4) Store in edge cache (async)
+    ctx.waitUntil(cache.put(cacheKey, response.clone()));
+
+    return withCors(response, origin);
 
   } catch (err) {
-
     return withCors(
       json({
         ok: false,
