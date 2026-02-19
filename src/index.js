@@ -16,7 +16,7 @@ function corsHeaders(origin) {
   };
 }
 
-function withCors(response, origin) {
+function withCors(response, origin) { 
   const h = new Headers(response.headers);
   const cors = corsHeaders(origin);
   for (const [k, v] of Object.entries(cors)) h.set(k, v);
