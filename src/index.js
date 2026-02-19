@@ -105,6 +105,7 @@ export default {
         `${url.origin}/api/image/${imageId}.jpg` +
         `?room=${encodeURIComponent(room)}` +
         `&state=${encodeURIComponent(state)}`;
+		`&seed=${encodeURIComponent(seedParam)}`;
 
       return withCors(
         new Response(null,{
