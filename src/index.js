@@ -216,4 +216,3 @@ export default {
     return withCors(response, origin);
   },
 };
-
