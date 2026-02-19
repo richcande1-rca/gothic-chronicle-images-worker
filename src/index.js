@@ -101,7 +101,7 @@ export default {
 
     // 3) Generate endpoint (stub for now)
     // POST /api/generate  { prompt, seed, w, h, variant, type }
-    else if (method === "POST" && url.pathname === "/api/generate") {
+     if (method === "POST" && url.pathname === "/api/generate") {
       let body;
       try {
         body = await request.json();
