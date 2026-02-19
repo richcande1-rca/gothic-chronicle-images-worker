@@ -92,6 +92,7 @@ export default {
 
       const room = (url.searchParams.get("room") || "").trim();
       const state = (url.searchParams.get("state") || "").trim();
+			const seedParam = (url.searchParams.get("seed") || room).trim(); 
 
       if (!room) {
         return withCors(json({ ok:false, error:"Missing ?room=" },400), origin);
