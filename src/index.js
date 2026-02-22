@@ -170,20 +170,17 @@ if (method === "GET" && url.pathname.startsWith("/api/image/")) {
     return withCors(cached, origin);
   }
 
-  const prompt =
-    `Ultra realistic cinematic gothic horror, Transylvania 2026. ` +
-    `Scene: ${room}. Fog, moonlight, ancient stone, dramatic shadows. ` +
-    `High detail, cinematic lighting, moody atmosphere. ` +
-    `No text, no watermark, no modern objects. ` +
-    (state ? `Story tone: ${state}.` : "");
+ let prompt =
+  `Ultra realistic cinematic gothic horror, Transylvania 2026. ` +
+  `Scene: ${room}. Fog, moonlight, ancient stone, dramatic shadows. ` +
+  `High detail, cinematic lighting, moody atmosphere. ` +
+  `No text, no watermark, no modern objects. `;
 
-  try {
-    if (!env.AI) {
-      return withCors(
-        json({ ok: false, error: "AI binding missing (env.AI undefined)" }, 500),
-        origin
-      );
-    }
+// 🔥 translate state into visual meaning
+if (state && state.includes("courtyard_ghost_seen")) {
+  prompt +=
+    " A pale ghostly apparition stands near a cracked fountain, semi-transparent, moonlit, eerie presence.";
+}
 
     // 2) Deterministic seed (stable for same room+state+seedParam)
     const seed = await seedFromText(`${room}::${state}::${seedParam}`);
