@@ -1,5 +1,5 @@
 // src/index.js
-// Gothic Chronicle Worker – clean routing version
+// Gothic Chronicle Worker – clean routing version (fixed)
 
 const ALLOWED_ORIGINS = new Set([
   "https://richcande1-rca.github.io",
@@ -16,7 +16,7 @@ function corsHeaders(origin) {
   };
 }
 
-function withCors(response, origin) { 
+function withCors(response, origin) {
   const h = new Headers(response.headers);
   const cors = corsHeaders(origin);
   for (const [k, v] of Object.entries(cors)) h.set(k, v);
@@ -34,12 +34,6 @@ function clampUInt32(n) {
   return (Number(n) >>> 0);
 }
 
-async function seedFromText(text) {
-  const hex = await sha256Hex(text);
-  // take first 8 hex chars => 32-bit seed
-  return clampUInt32(parseInt(hex.slice(0, 8), 16));
-}
-
 async function sha256Hex(text) {
   const bytes = new TextEncoder().encode(text);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
@@ -48,9 +42,29 @@ async function sha256Hex(text) {
     .join("");
 }
 
+async function seedFromText(text) {
+  const hex = await sha256Hex(text);
+  return clampUInt32(parseInt(hex.slice(0, 8), 16));
+}
+
+// Parse `state` like: "f:courtyard_ghost_seen,candle_lit|m:m_courtyard_first"
+function parseState(stateStr) {
+  const out = { flags: new Set(), miles: new Set() };
+  if (!stateStr) return out;
+
+  const parts = stateStr.split("|");
+  for (const p of parts) {
+    if (p.startsWith("f:")) {
+      p.slice(2).split(",").map(s => s.trim()).filter(Boolean).forEach(s => out.flags.add(s));
+    } else if (p.startsWith("m:")) {
+      p.slice(2).split(",").map(s => s.trim()).filter(Boolean).forEach(s => out.miles.add(s));
+    }
+  }
+  return out;
+}
+
 export default {
   async fetch(request, env, ctx) {
-
     const url = new URL(request.url);
     const origin = request.headers.get("Origin");
     const method = request.method.toUpperCase();
@@ -67,9 +81,7 @@ export default {
     // =====================
     if (method === "GET" && url.pathname === "/") {
       return withCors(
-        new Response("Hello World!", {
-          headers: { "Content-Type": "text/plain" },
-        }),
+        new Response("Hello World!", { headers: { "Content-Type": "text/plain" } }),
         origin
       );
     }
@@ -86,32 +98,29 @@ export default {
 
     // =====================
     // IMAGE REDIRECT
-    // GET /image?room=&state=
+    // GET /image?room=&state=&seed=&t=
     // =====================
     if (method === "GET" && url.pathname === "/image") {
-
       const room = (url.searchParams.get("room") || "").trim();
       const state = (url.searchParams.get("state") || "").trim();
-			const seedParam = (url.searchParams.get("seed") || room).trim(); 
+      const seedParam = (url.searchParams.get("seed") || room).trim();
 
       if (!room) {
-        return withCors(json({ ok:false, error:"Missing ?room=" },400), origin);
+        return withCors(json({ ok: false, error: "Missing ?room=" }, 400), origin);
       }
 
-      const payload = { room, state, w:768, h:768 };
+      // IMPORTANT: include seed in payload so imageId differs across seeds too
+      const payload = { room, state, seed: seedParam, w: 768, h: 768 };
       const imageId = "img_" + await sha256Hex(JSON.stringify(payload));
 
       const redirectUrl =
         `${url.origin}/api/image/${imageId}.jpg` +
         `?room=${encodeURIComponent(room)}` +
-        `&state=${encodeURIComponent(state)}`;
-		`&seed=${encodeURIComponent(seedParam)}`;
+        `&state=${encodeURIComponent(state)}` +
+        `&seed=${encodeURIComponent(seedParam)}`;
 
       return withCors(
-        new Response(null,{
-          status:302,
-          headers:{ Location: redirectUrl }
-        }),
+        new Response(null, { status: 302, headers: { Location: redirectUrl } }),
         origin
       );
     }
@@ -120,16 +129,15 @@ export default {
     // API GENERATE (JSON helper)
     // =====================
     if (method === "POST" && url.pathname === "/api/generate") {
-
       let body;
       try {
         body = await request.json();
       } catch {
-        return withCors(json({ ok:false, error:"Invalid JSON" },400), origin);
+        return withCors(json({ ok: false, error: "Invalid JSON" }, 400), origin);
       }
 
       if (!body?.prompt) {
-        return withCors(json({ ok:false, error:"Missing prompt" },400), origin);
+        return withCors(json({ ok: false, error: "Missing prompt" }, 400), origin);
       }
 
       const payload = {
@@ -142,89 +150,87 @@ export default {
       const imageId = "img_" + await sha256Hex(JSON.stringify(payload));
 
       return withCors(
-        json({
-          ok:true,
-          imageId,
-          url:`${url.origin}/api/image/${imageId}.jpg`
-        }),
+        json({ ok: true, imageId, url: `${url.origin}/api/image/${imageId}.jpg` }),
         origin
       );
     }
 
-// =====================
-// REAL IMAGE GENERATION (DETERMINISTIC + CACHED)
-// =====================
-if (method === "GET" && url.pathname.startsWith("/api/image/")) {
+    // =====================
+    // REAL IMAGE GENERATION (DETERMINISTIC + CACHED)
+    // =====================
+    if (method === "GET" && url.pathname.startsWith("/api/image/")) {
+      try {
+        const room = (url.searchParams.get("room") || "gothic estate").trim();
+        const state = (url.searchParams.get("state") || "").trim();
+        const seedParam = (url.searchParams.get("seed") || room).trim();
 
-  const room = (url.searchParams.get("room") || "gothic estate").trim();
-  const state = (url.searchParams.get("state") || "").trim();
-  const seedParam = (url.searchParams.get("seed") || room).trim();
+        // Cache key = full request URL (includes room/state/seed + /api/image/<id>.jpg)
+        const cacheKey = new Request(url.toString(), { method: "GET" });
+        const cache = caches.default;
 
-  // Cache key = full request URL (includes room/state/seed + /api/image/<id>.jpg)
-  const cacheKey = new Request(url.toString(), { method: "GET" });
-  const cache = caches.default;
+        // 1) Try cache first
+        const cached = await cache.match(cacheKey);
+        if (cached) return withCors(cached, origin);
 
-  // 1) Try cache first
-  const cached = await cache.match(cacheKey);
-  if (cached) {
-    return withCors(cached, origin);
-  }
+        const st = parseState(state);
 
- let prompt =
-  `Ultra realistic cinematic gothic horror, Transylvania 2026. ` +
-  `Scene: ${room}. Fog, moonlight, ancient stone, dramatic shadows. ` +
-  `High detail, cinematic lighting, moody atmosphere. ` +
-  `No text, no watermark, no modern objects. `;
+        // Base prompt
+        let prompt =
+          `Ultra realistic cinematic gothic horror. ` +
+          `Scene: ${room}. Fog, moonlight, ancient stone, dramatic shadows. ` +
+          `High detail, cinematic lighting, moody atmosphere. ` +
+          `No text, no watermark, no modern objects. `;
 
-// 🔥 translate state into visual meaning
-if (state && state.includes("courtyard_ghost_seen")) {
-  prompt +=
-    " A pale ghostly apparition stands near a cracked fountain, semi-transparent, moonlit, eerie presence.";
-}
+        // ✅ Courtyard ghost only, and make it unmistakable
+        if (room.toLowerCase() === "courtyard" && st.flags.has("courtyard_ghost_seen")) {
+          prompt +=
+            " Include a tall pale ghostly apparition near a cracked fountain; semi-transparent, subtle glow, Victorian haunting presence; mist coiling around its feet; eerie but clear focal subject.";
+        }
 
-    // 2) Deterministic seed (stable for same room+state+seedParam)
-    const seed = await seedFromText(`${room}::${state}::${seedParam}`);
+        // Optional: react to candle_lit to brighten interiors slightly
+        if (st.flags.has("candle_lit")) {
+          prompt += " Add warm candlelight highlights and deeper shadow contrast.";
+        }
 
-    // 3) Generate
-    const result = await env.AI.run("@cf/leonardo/phoenix-1.0", {
-      prompt,
-      // If the model supports seed, this helps consistency.
-      // If ignored, caching still prevents re-gen for same URL.
-      seed
-    });
+        // 2) Deterministic seed (stable for same room+state+seedParam)
+        const seed = await seedFromText(`${room}::${state}::${seedParam}`);
 
-    const imageData = result?.image || result;
+        // 3) Generate
+        const result = await env.AI.run("@cf/leonardo/phoenix-1.0", {
+          prompt,
+          seed
+        });
 
-    const response = new Response(imageData, {
-      status: 200,
-      headers: {
-        "Content-Type": "image/jpeg",
-        // Tell browsers/CDN this is safe to reuse for a long time
-        "Cache-Control": "public, max-age=31536000, immutable",
+        const imageData = result?.image || result;
+
+        const response = new Response(imageData, {
+          status: 200,
+          headers: {
+            "Content-Type": "image/jpeg",
+            "Cache-Control": "public, max-age=31536000, immutable",
+          }
+        });
+
+        // 4) Store in edge cache (async)
+        ctx.waitUntil(cache.put(cacheKey, response.clone()));
+
+        return withCors(response, origin);
+      } catch (err) {
+        return withCors(
+          json({
+            ok: false,
+            error: "Image generation failed",
+            detail: String(err?.message || err),
+            hasAI: !!env.AI
+          }, 500),
+          origin
+        );
       }
-    });
-
-    // 4) Store in edge cache (async)
-    ctx.waitUntil(cache.put(cacheKey, response.clone()));
-
-    return withCors(response, origin);
-
-  } catch (err) {
-    return withCors(
-      json({
-        ok: false,
-        error: "Image generation failed",
-        detail: String(err?.message || err),
-        hasAI: !!env.AI
-      }, 500),
-      origin
-    );
-  }
-}
+    }
 
     // =====================
     // FALLBACK
     // =====================
-    return withCors(json({ ok:false, error:"Not found" },404), origin);
+    return withCors(json({ ok: false, error: "Not found" }, 404), origin);
   }
 };
