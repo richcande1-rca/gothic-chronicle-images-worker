@@ -202,13 +202,15 @@ export default {
             "Keep consistent layout across renders.";
         }
 
-        // Ghost positioning (NOT overlapping)
-        if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
-          prompt +=
-            " Include a tall pale ghostly apparition in the LEFT foreground near a weathered statue, " +
-            "one to two meters away from the fountain, NOT overlapping or inside the fountain basin. " +
-            "Semi-transparent Victorian apparition with subtle glow and mist.";
-        }
+       // Ghost positioning (CLEAR and NOT overlapping)
+if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
+  prompt +=
+    " Add a CLEAR, FULL-BODY ghost figure as a secondary subject: a tall pale Victorian apparition " +
+    "standing in the LEFT foreground near a weathered statue, one to two meters away from the central fountain. " +
+    "The ghost must be clearly visible and recognizable as a human-shaped figure (head, torso, arms), " +
+    "high contrast against the background, NOT obscured by fog, NOT blended into mist, " +
+    "NOT overlapping or inside the fountain basin. The central fountain remains fully visible at center.";
+}
 
         if (st.flags.has("candle_lit")) {
           prompt += " Add warm candlelight highlights and deeper shadow contrast.";
