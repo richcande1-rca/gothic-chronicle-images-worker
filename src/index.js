@@ -205,10 +205,7 @@ export default {
 // Ghost positioning (SAFE ZONE — visible, not cropped, not centered)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
 prompt +=
-  " Include TWO subjects: (1) the centered stone fountain, fully visible, and (2) a pale Victorian woman-apparition left-of-center on the cobblestones between the fountain and the left statue. " +
-" Her form is significantly more translucent, with moonlight clearly visible through her body. " +
-" A faint internal silver-blue luminosity concentrated at her core creates a more dramatic supernatural presence without a bright outer glow. "+
-  "Gothic realism, cinematic moonlight, unsettling but elegant." + " Subtle cold rim lighting outlines her silhouette against a slightly darker stone wall behind her, increasing separation from the background while maintaining gothic realism. ";
+  " A ghostly apparation appears nect to the fountain"; + "humanlike in form, yet glowing but also translucent";
 }
 
         if (st.flags.has("candle_lit")) {
