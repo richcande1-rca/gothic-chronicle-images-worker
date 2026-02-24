@@ -205,16 +205,26 @@ export default {
 // Ghost positioning (SAFE ZONE — visible, not cropped, not centered)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
   prompt +=
-   prompt +=
-  " A translucent Victorian ghost stands left-of-center near the fountain, " +
-  "partially transparent with moonlight clearly visible through her body, " +
-  "faint mist dissolving from her edges, eerie and unsettling gothic atmosphere. " +
-  "Her form is ethereal and unstable, barely maintaining a human silhouette, " +
-  "with portions fading into mist";
-}
+    " An ethereal mist-like apparition is clearly present " +
+    " as a primary subject in the scene. " +
+    " The entity forms LEFT OF THE CENTRAL FOUNTAIN, " +
+    " appearing as swirling translucent energy attempting " +
+    " to coalesce into a human silhouette. " +
+    " It is NOT solid or fully human; " +
+    " more vapor, light, and unstable spectral motion. " +
+    " Moonlight passes through shifting layers of mist " +
+    " and faint luminous strands. " +
+    " The shape continuously forms and dissolves, " +
+    " as if struggling to regain human identity. " +
+    " No clear facial detail, only suggestion of form. " +
+    " Full apparition visible in frame, " +
+    " not cropped and not obscured. ";
 
-if (st.flags.has("candle_lit")) {
-  prompt += " Add warm candlelight highlights and deeper shadow contrast.";
+  if (st.flags.has("candle_lit")) {
+    prompt +=
+      " Add warm candlelight interacting with the mist, " +
+      " creating subtle glowing highlights and deeper shadows. ";
+  }
 }
 
         // 2) Deterministic seed
