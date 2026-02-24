@@ -204,16 +204,14 @@ export default {
 
 // Ghost positioning (SAFE ZONE — visible, not cropped, not centered)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
-prompt +=
- " A translucent Victorian ghost stands left-of-center near the fountain, 
-	partially transparent with moonlight clearly visible through her body, faint mist dissolving from her edges, eerie and unsettling gothic atmosphere. " +
-	
-	" Her form is ethereal and unstable, barely maintaining a human silhouette, with portions fading into mist and re-forming as if she is only partially anchored to reality. "
+  prompt +=
+    " A translucent Victorian ghost stands left-of-center near the fountain, partially transparent with moonlight clearly visible through her body, faint mist dissolving from her edges, eerie and unsettling gothic atmosphere. " +
+    " Her form is ethereal and unstable, barely maintaining a human silhouette, with portions fading into mist and re-forming as if she is only partially anchored to reality. ";
 }
 
-        if (st.flags.has("candle_lit")) {
-          prompt += " Add warm candlelight highlights and deeper shadow contrast.";
-        }
+if (st.flags.has("candle_lit")) {
+  prompt += " Add warm candlelight highlights and deeper shadow contrast.";
+}
 
         // 2) Deterministic seed
         // Courtyard: stable composition across state changes
