@@ -205,13 +205,14 @@ export default {
 // Ghost positioning (SAFE ZONE — visible, not cropped, not centered)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
   prompt +=
-    " Add a CLEAR, FULL-BODY ghostly apparition that MUST be present as a secondary subject. " +
-    "Place the ghost LEFT-OF-CENTER (not at the edge), standing on the open cobblestones between the fountain and the left statue, " +
-    "fully inside the frame with its entire body visible (not cropped). " +
-    "The ghost is not centered and not aligned with the fountain, but remains clearly visible in the main viewing area. " +
-    "The fountain remains centered and fully visible; the ghost must NOT emerge from water and must NOT touch the fountain. " +
-    "Unmistakably supernatural: translucent body with background visible through it, cold inner glow, luminous eyes, " +
-    "diffused flickering edges, lower body fading into mist. High contrast. Do NOT omit the ghost.";
+    prompt +=
+  " A pale Victorian apparition stands left-of-center on the cobblestones between the fountain and the left statue. " +
+  "She is fully visible within the frame, separate from the fountain, not emerging from water. " +
+  "Her form is slender and human, partially translucent, with subtle fragmentation along the edges as if dissolving into the night air. " +
+  "The moonlight passes faintly through her figure. " +
+  "Her expression is unreadable, eyes dimly reflective rather than glowing, and her lower form softens into drifting mist near the ground. " +
+  "She feels ancient and sorrowful rather than theatrical. " +
+  "Maintain the centered fountain and full courtyard composition.";
 }
 
         if (st.flags.has("candle_lit")) {
