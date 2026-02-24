@@ -221,11 +221,16 @@ if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
         // 2) Deterministic seed
         // Courtyard: stable composition across state changes
         // Other rooms: state influences composition (optional)
-        let seedKey = `${room}::${seedParam}`;
-        if (!isCourtyard) {
-          seedKey = `${room}::${state}::${seedParam}`;
-        }
-        const seed = await seedFromText(seedKey);
+       let seedKey = `${room}::${seedParam}`;
+
+if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
+  // new deterministic camera for the ghost moment
+  seedKey = `${room}::${seedParam}::ghost`;
+} else if (!isCourtyard) {
+  seedKey = `${room}::${state}::${seedParam}`;
+}
+
+const seed = await seedFromText(seedKey);
 
         // Debug mode
         if (url.searchParams.get("debug") === "1") {
