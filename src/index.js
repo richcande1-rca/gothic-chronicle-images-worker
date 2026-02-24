@@ -205,7 +205,7 @@ export default {
 // Ghost positioning (SAFE ZONE — visible, not cropped, not centered)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
 prompt +=
-  " A ghostly apparation next to the fountain"; + "humanlike in form, yet glowing but also translucent";
+ " A translucent Victorian ghost stands left-of-center near the fountain, partially transparent with moonlight clearly visible through her body, faint mist dissolving from her edges, eerie and unsettling gothic atmosphere. "
 }
 
         if (st.flags.has("candle_lit")) {
