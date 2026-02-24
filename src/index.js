@@ -1,5 +1,5 @@
 // src/index.js
-// Gothic Chronicle Worker – clean routing version (FINAL)
+// Gothic Chronicle Worker – clean routing version (FINAL w/ versioned cache bust)
 
 const ALLOWED_ORIGINS = new Set([
   "https://richcande1-rca.github.io",
@@ -65,7 +65,6 @@ function parseState(stateStr) {
 
 export default {
   async fetch(request, env, ctx) {
-
     const url = new URL(request.url);
     const origin = request.headers.get("Origin");
     const method = request.method.toUpperCase();
@@ -99,18 +98,20 @@ export default {
 
     // =====================
     // IMAGE REDIRECT
+    // GET /image?room=&state=&seed=&v=&t=
     // =====================
     if (method === "GET" && url.pathname === "/image") {
-
       const room = (url.searchParams.get("room") || "").trim();
       const state = (url.searchParams.get("state") || "").trim();
       const seedParam = (url.searchParams.get("seed") || room).trim();
+      const v = (url.searchParams.get("v") || "1").trim(); // ✅ prompt/cache version
 
       if (!room) {
-        return withCors(json({ ok:false, error:"Missing ?room=" },400), origin);
+        return withCors(json({ ok: false, error: "Missing ?room=" }, 400), origin);
       }
 
-      const payload = { room, state, seed: seedParam, w:768, h:768 };
+      // IMPORTANT: include seed + v in payload so imageId changes when prompts change
+      const payload = { room, state, seed: seedParam, v, w: 768, h: 768 };
       const imageId = "img_" + await sha256Hex(JSON.stringify(payload));
 
       const redirectUrl =
@@ -118,28 +119,60 @@ export default {
         `?room=${encodeURIComponent(room)}` +
         `&state=${encodeURIComponent(state)}` +
         `&seed=${encodeURIComponent(seedParam)}` +
-        (url.searchParams.get("debug")==="1" ? `&debug=1` : "");
+        `&v=${encodeURIComponent(v)}` +
+        (url.searchParams.get("debug") === "1" ? `&debug=1` : "");
 
       return withCors(
-        new Response(null,{ status:302, headers:{ Location:redirectUrl }}),
+        new Response(null, { status: 302, headers: { Location: redirectUrl } }),
         origin
       );
     }
 
     // =====================
-    // REAL IMAGE GENERATION
+    // API GENERATE (JSON helper)
+    // =====================
+    if (method === "POST" && url.pathname === "/api/generate") {
+      let body;
+      try {
+        body = await request.json();
+      } catch {
+        return withCors(json({ ok: false, error: "Invalid JSON" }, 400), origin);
+      }
+
+      if (!body?.prompt) {
+        return withCors(json({ ok: false, error: "Missing prompt" }, 400), origin);
+      }
+
+      const payload = {
+        prompt: body.prompt,
+        seed: body.seed ?? 0,
+        w: body.w ?? 768,
+        h: body.h ?? 768
+      };
+
+      const imageId = "img_" + await sha256Hex(JSON.stringify(payload));
+
+      return withCors(
+        json({ ok: true, imageId, url: `${url.origin}/api/image/${imageId}.jpg` }),
+        origin
+      );
+    }
+
+    // =====================
+    // REAL IMAGE GENERATION (DETERMINISTIC + CACHED)
     // =====================
     if (method === "GET" && url.pathname.startsWith("/api/image/")) {
-
       try {
-
         const room = (url.searchParams.get("room") || "gothic estate").trim();
         const state = (url.searchParams.get("state") || "").trim();
         const seedParam = (url.searchParams.get("seed") || room).trim();
+        const v = (url.searchParams.get("v") || "1").trim(); // ✅ keep in URL for cache identity
 
-        const cacheKey = new Request(url.toString(), { method:"GET" });
+        // Cache key = full request URL (includes room/state/seed/v + /api/image/<id>.jpg)
+        const cacheKey = new Request(url.toString(), { method: "GET" });
         const cache = caches.default;
 
+        // 1) Try cache first
         const cached = await cache.match(cacheKey);
         if (cached) return withCors(cached, origin);
 
@@ -181,20 +214,24 @@ export default {
           prompt += " Add warm candlelight highlights and deeper shadow contrast.";
         }
 
-        // Stable courtyard composition seed
+        // 2) Deterministic seed
+        // Courtyard: stable composition across state changes
+        // Other rooms: state influences composition (optional)
         let seedKey = `${room}::${seedParam}`;
         if (!isCourtyard) {
           seedKey = `${room}::${state}::${seedParam}`;
         }
-
         const seed = await seedFromText(seedKey);
 
         // Debug mode
-        if (url.searchParams.get("debug")==="1") {
-          return withCors(json({ room, isCourtyard, seed, prompt }), origin);
+        if (url.searchParams.get("debug") === "1") {
+          return withCors(
+            json({ ok: true, room, state, seedParam, v, isCourtyard, seedKey, seed, prompt }),
+            origin
+          );
         }
 
-        // Generate image
+        // 3) Generate
         const result = await env.AI.run("@cf/leonardo/phoenix-1.0", {
           prompt,
           seed
@@ -202,32 +239,34 @@ export default {
 
         const imageData = result?.image || result;
 
-        const response = new Response(imageData,{
-          status:200,
-          headers:{
-            "Content-Type":"image/jpeg",
-            "Cache-Control":"public, max-age=31536000, immutable"
+        const response = new Response(imageData, {
+          status: 200,
+          headers: {
+            "Content-Type": "image/jpeg",
+            "Cache-Control": "public, max-age=31536000, immutable",
           }
         });
 
+        // 4) Store in edge cache (async)
         ctx.waitUntil(cache.put(cacheKey, response.clone()));
 
         return withCors(response, origin);
-
-      } catch(err) {
-
+      } catch (err) {
         return withCors(
           json({
-            ok:false,
-            error:"Image generation failed",
-            detail:String(err?.message||err),
-            hasAI:!!env.AI
-          },500),
+            ok: false,
+            error: "Image generation failed",
+            detail: String(err?.message || err),
+            hasAI: !!env.AI
+          }, 500),
           origin
         );
       }
     }
 
-    return withCors(json({ ok:false, error:"Not found" },404), origin);
+    // =====================
+    // FALLBACK
+    // =====================
+    return withCors(json({ ok: false, error: "Not found" }, 404), origin);
   }
 };
