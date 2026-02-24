@@ -206,9 +206,8 @@ export default {
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
 prompt +=
   " Include TWO subjects: (1) the centered stone fountain, fully visible, and (2) a pale Victorian woman-apparition left-of-center on the cobblestones between the fountain and the left statue. " +
-  "The woman is fully inside the frame, full-body visible, separate from the fountain, not emerging from water. " +
-  "She wears tattered Victorian mourning attire (no sheet costume), her form partially translucent with moonlight faintly passing through. " +
-  "Edges subtly dissolve into mist near the ground; her eyes are dimly reflective (not cartoon-glowing). " +
+" Her form is significantly more translucent, with moonlight clearly visible through her body. " +
+" A faint internal silver-blue luminosity concentrated at her core creates a more dramatic supernatural presence without a bright outer glow. "+
   "Gothic realism, cinematic moonlight, unsettling but elegant." + " Subtle cold rim lighting outlines her silhouette against a slightly darker stone wall behind her, increasing separation from the background while maintaining gothic realism. ";
 }
 
