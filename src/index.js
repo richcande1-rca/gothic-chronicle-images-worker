@@ -1,5 +1,5 @@
 // src/index.js
-// Gothic Chronicle Worker – clean routing version (fixed)
+// Gothic Chronicle Worker – clean routing version (FINAL)
 
 const ALLOWED_ORIGINS = new Set([
   "https://richcande1-rca.github.io",
@@ -47,7 +47,7 @@ async function seedFromText(text) {
   return clampUInt32(parseInt(hex.slice(0, 8), 16));
 }
 
-// Parse `state` like: "f:courtyard_ghost_seen,candle_lit|m:m_courtyard_first"
+// Parse state like: "f:courtyard_ghost_seen,candle_lit|m:m_courtyard_first"
 function parseState(stateStr) {
   const out = { flags: new Set(), miles: new Set() };
   if (!stateStr) return out;
@@ -55,17 +55,9 @@ function parseState(stateStr) {
   const parts = stateStr.split("|");
   for (const p of parts) {
     if (p.startsWith("f:")) {
-      p.slice(2)
-        .split(",")
-        .map(s => s.trim())
-        .filter(Boolean)
-        .forEach(s => out.flags.add(s));
+      p.slice(2).split(",").map(s => s.trim()).filter(Boolean).forEach(s => out.flags.add(s));
     } else if (p.startsWith("m:")) {
-      p.slice(2)
-        .split(",")
-        .map(s => s.trim())
-        .filter(Boolean)
-        .forEach(s => out.miles.add(s));
+      p.slice(2).split(",").map(s => s.trim()).filter(Boolean).forEach(s => out.miles.add(s));
     }
   }
   return out;
@@ -73,6 +65,7 @@ function parseState(stateStr) {
 
 export default {
   async fetch(request, env, ctx) {
+
     const url = new URL(request.url);
     const origin = request.headers.get("Origin");
     const method = request.method.toUpperCase();
@@ -106,77 +99,47 @@ export default {
 
     // =====================
     // IMAGE REDIRECT
-    // GET /image?room=&state=&seed=&t=
     // =====================
     if (method === "GET" && url.pathname === "/image") {
+
       const room = (url.searchParams.get("room") || "").trim();
       const state = (url.searchParams.get("state") || "").trim();
       const seedParam = (url.searchParams.get("seed") || room).trim();
 
       if (!room) {
-        return withCors(json({ ok: false, error: "Missing ?room=" }, 400), origin);
+        return withCors(json({ ok:false, error:"Missing ?room=" },400), origin);
       }
 
-      // IMPORTANT: include seed in payload so imageId differs across seeds too
-      const payload = { room, state, seed: seedParam, w: 768, h: 768 };
+      const payload = { room, state, seed: seedParam, w:768, h:768 };
       const imageId = "img_" + await sha256Hex(JSON.stringify(payload));
 
       const redirectUrl =
         `${url.origin}/api/image/${imageId}.jpg` +
         `?room=${encodeURIComponent(room)}` +
         `&state=${encodeURIComponent(state)}` +
-        `&seed=${encodeURIComponent(seedParam)}`;
+        `&seed=${encodeURIComponent(seedParam)}` +
+        (url.searchParams.get("debug")==="1" ? `&debug=1` : "");
 
       return withCors(
-        new Response(null, { status: 302, headers: { Location: redirectUrl } }),
+        new Response(null,{ status:302, headers:{ Location:redirectUrl }}),
         origin
       );
     }
 
     // =====================
-    // API GENERATE (JSON helper)
-    // =====================
-    if (method === "POST" && url.pathname === "/api/generate") {
-      let body;
-      try {
-        body = await request.json();
-      } catch {
-        return withCors(json({ ok: false, error: "Invalid JSON" }, 400), origin);
-      }
-
-      if (!body?.prompt) {
-        return withCors(json({ ok: false, error: "Missing prompt" }, 400), origin);
-      }
-
-      const payload = {
-        prompt: body.prompt,
-        seed: body.seed ?? 0,
-        w: body.w ?? 768,
-        h: body.h ?? 768
-      };
-
-      const imageId = "img_" + await sha256Hex(JSON.stringify(payload));
-
-      return withCors(
-        json({ ok: true, imageId, url: `${url.origin}/api/image/${imageId}.jpg` }),
-        origin
-      );
-    }
-
-    // =====================
-    // REAL IMAGE GENERATION (DETERMINISTIC + CACHED)
+    // REAL IMAGE GENERATION
     // =====================
     if (method === "GET" && url.pathname.startsWith("/api/image/")) {
+
       try {
+
         const room = (url.searchParams.get("room") || "gothic estate").trim();
         const state = (url.searchParams.get("state") || "").trim();
         const seedParam = (url.searchParams.get("seed") || room).trim();
 
-        // Cache key = full request URL (includes room/state/seed + /api/image/<id>.jpg)
-        const cacheKey = new Request(url.toString(), { method: "GET" });
+        const cacheKey = new Request(url.toString(), { method:"GET" });
         const cache = caches.default;
 
-        // 1) Try cache first
         const cached = await cache.match(cacheKey);
         if (cached) return withCors(cached, origin);
 
@@ -185,44 +148,53 @@ export default {
         const roomKey = room.toLowerCase();
         const isCourtyard = roomKey.includes("courtyard");
 
-        // Base prompt
+        // ===== PROMPT BUILD =====
+
+        const sceneLine = isCourtyard
+          ? "Scene: a moonlit gothic stone courtyard with a central cracked stone fountain clearly visible at center frame."
+          : `Scene: ${room}.`;
+
         let prompt =
           `Ultra realistic cinematic gothic horror. ` +
-          `Scene: ${room}. Fog, moonlight, ancient stone, dramatic shadows. ` +
+          `${sceneLine} ` +
+          `Fog, moonlight, ancient stone, dramatic shadows. ` +
           `High detail, cinematic lighting, moody atmosphere. ` +
           `No text, no watermark, no modern objects. `;
 
-        // ✅ Courtyard continuity anchor: ALWAYS include the fountain + landmarks
+        // Courtyard anchor
         if (isCourtyard) {
           prompt +=
-            " Establishing features: the composition must clearly show a central cracked stone fountain as the main landmark (clearly visible, not obscured); " +
-            "wet cobblestones, ivy-covered stone walls, weathered statues, wrought-iron gate in the distance; " +
-            "keep the same layout and landmarks across renders; only mood/characters may change.";
+            " The central cracked stone fountain MUST be clearly visible and centered; " +
+            "wet cobblestones, ivy-covered walls, weathered statues, wrought-iron gate in distance. " +
+            "Keep consistent layout across renders.";
         }
 
-        // ✅ Courtyard ghost only, and make it unmistakable
+        // Ghost positioning (NOT overlapping)
         if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
           prompt +=
-            " Include a tall pale ghostly apparition beside the central cracked stone fountain; " +
-            "semi-transparent, subtle glow, Victorian haunting presence; " +
-            "mist coiling around its feet; eerie but clear focal subject.";
+            " Include a tall pale ghostly apparition in the LEFT foreground near a weathered statue, " +
+            "one to two meters away from the fountain, NOT overlapping or inside the fountain basin. " +
+            "Semi-transparent Victorian apparition with subtle glow and mist.";
         }
 
-        // Optional: react to candle_lit to brighten interiors slightly
         if (st.flags.has("candle_lit")) {
           prompt += " Add warm candlelight highlights and deeper shadow contrast.";
         }
 
-        // 2) Deterministic seed
-        //    Courtyard: keep composition stable across state changes
-        //    Other rooms: allow state to influence composition (optional)
+        // Stable courtyard composition seed
         let seedKey = `${room}::${seedParam}`;
         if (!isCourtyard) {
           seedKey = `${room}::${state}::${seedParam}`;
         }
+
         const seed = await seedFromText(seedKey);
 
-        // 3) Generate
+        // Debug mode
+        if (url.searchParams.get("debug")==="1") {
+          return withCors(json({ room, isCourtyard, seed, prompt }), origin);
+        }
+
+        // Generate image
         const result = await env.AI.run("@cf/leonardo/phoenix-1.0", {
           prompt,
           seed
@@ -230,34 +202,32 @@ export default {
 
         const imageData = result?.image || result;
 
-        const response = new Response(imageData, {
-          status: 200,
-          headers: {
-            "Content-Type": "image/jpeg",
-            "Cache-Control": "public, max-age=31536000, immutable",
+        const response = new Response(imageData,{
+          status:200,
+          headers:{
+            "Content-Type":"image/jpeg",
+            "Cache-Control":"public, max-age=31536000, immutable"
           }
         });
 
-        // 4) Store in edge cache (async)
         ctx.waitUntil(cache.put(cacheKey, response.clone()));
 
         return withCors(response, origin);
-      } catch (err) {
+
+      } catch(err) {
+
         return withCors(
           json({
-            ok: false,
-            error: "Image generation failed",
-            detail: String(err?.message || err),
-            hasAI: !!env.AI
-          }, 500),
+            ok:false,
+            error:"Image generation failed",
+            detail:String(err?.message||err),
+            hasAI:!!env.AI
+          },500),
           origin
         );
       }
     }
 
-    // =====================
-    // FALLBACK
-    // =====================
-    return withCors(json({ ok: false, error: "Not found" }, 404), origin);
+    return withCors(json({ ok:false, error:"Not found" },404), origin);
   }
 };
