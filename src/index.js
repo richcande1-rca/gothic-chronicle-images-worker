@@ -209,7 +209,7 @@ prompt +=
   "The woman is fully inside the frame, full-body visible, separate from the fountain, not emerging from water. " +
   "She wears tattered Victorian mourning attire (no sheet costume), her form partially translucent with moonlight faintly passing through. " +
   "Edges subtly dissolve into mist near the ground; her eyes are dimly reflective (not cartoon-glowing). " +
-  "Gothic realism, cinematic moonlight, unsettling but elegant." " Subtle cold rim lighting outlines her silhouette against a slightly darker stone wall behind her, increasing separation from the background while maintaining gothic realism. ";
+  "Gothic realism, cinematic moonlight, unsettling but elegant." + " Subtle cold rim lighting outlines her silhouette against a slightly darker stone wall behind her, increasing separation from the background while maintaining gothic realism. ";
 }
 
         if (st.flags.has("candle_lit")) {
