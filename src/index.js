@@ -210,7 +210,7 @@ if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
   "partially transparent with moonlight clearly visible through her body, " +
   "faint mist dissolving from her edges, eerie and unsettling gothic atmosphere. " +
   "Her form is ethereal and unstable, barely maintaining a human silhouette, " +
-  "with portions fading into mist and re-forming as if she is only partially anchored to reality. ";
+  "with portions fading into mist";
 }
 
 if (st.flags.has("candle_lit")) {
