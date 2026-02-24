@@ -202,14 +202,20 @@ export default {
             "Keep consistent layout across renders.";
         }
 
-       // Ghost positioning (CLEAR and NOT overlapping)
+      // Ghost positioning (CLEAR and MAXIMUM CREEPY / UNMISTAKABLY SUPERNATURAL)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
   prompt +=
-    " Add a CLEAR, FULL-BODY ghost figure as a secondary subject: a tall pale Victorian apparition " +
+    " Add a CLEAR, FULL-BODY ghostly apparition as a secondary subject: a tall pale Victorian spirit " +
     "standing in the LEFT foreground near a weathered statue, one to two meters away from the central fountain. " +
-    "The ghost must be clearly visible and recognizable as a human-shaped figure (head, torso, arms), " +
-    "high contrast against the background, NOT obscured by fog, NOT blended into mist, " +
-    "NOT overlapping or inside the fountain basin. The central fountain remains fully visible at center.";
+    "Unmistakably supernatural and terrifying: semi-transparent body with the background visible through it, " +
+    "faint inner glow, cold bluish-white rim light, drifting tattered garments that move as if underwater, " +
+    "lower body dissolving into curling ground mist, wisps of fog passing through the torso and arms. " +
+    "Face partially obscured by shadow and veil, but with faintly luminous eyes; unnatural posture; " +
+    "subtle double-exposure echo/trailing afterimage, slight motion blur like a lingering presence. " +
+    "Thin tendrils of mist coil around its hands and feet; damp air sparkling with spectral dust motes. " +
+    "High contrast so the figure reads clearly, yet visibly spectral with soft diffused edges (not solid human). " +
+    "NOT overlapping or inside the fountain basin. The central fountain remains fully visible at center. " +
+    "Do NOT omit the ghost.";
 }
 
         if (st.flags.has("candle_lit")) {
