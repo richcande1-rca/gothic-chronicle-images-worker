@@ -202,20 +202,16 @@ export default {
             "Keep consistent layout across renders.";
         }
 
-      // Ghost positioning (CLEAR and MAXIMUM CREEPY / UNMISTAKABLY SUPERNATURAL)
+    // Ghost positioning (FOREGROND PRESENCE / CINEMATIC HORROR)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
   prompt +=
-    " Add a CLEAR, FULL-BODY ghostly apparition as a secondary subject: a tall pale Victorian spirit " +
-    "standing in the LEFT foreground near a weathered statue, one to two meters away from the central fountain. " +
-    "Unmistakably supernatural and terrifying: semi-transparent body with the background visible through it, " +
-    "faint inner glow, cold bluish-white rim light, drifting tattered garments that move as if underwater, " +
-    "lower body dissolving into curling ground mist, wisps of fog passing through the torso and arms. " +
-    "Face partially obscured by shadow and veil, but with faintly luminous eyes; unnatural posture; " +
-    "subtle double-exposure echo/trailing afterimage, slight motion blur like a lingering presence. " +
-    "Thin tendrils of mist coil around its hands and feet; damp air sparkling with spectral dust motes. " +
-    "High contrast so the figure reads clearly, yet visibly spectral with soft diffused edges (not solid human). " +
-    "NOT overlapping or inside the fountain basin. The central fountain remains fully visible at center. " +
-    "Do NOT omit the ghost.";
+    " Add a CLEAR, FULL-BODY ghostly apparition positioned in the LEFT FOREGROUND, closer to the viewer than the fountain, " +
+    "standing partially turned toward the camera. The central fountain remains visible behind it. " +
+    "The figure is unmistakably supernatural: semi-transparent body with background faintly visible through it, " +
+    "cold pale glow not caused by moonlight, edges softly flickering and diffused. " +
+    "Face partially shadowed with faint luminous eyes watching the viewer; unnatural stillness. " +
+    "Lower body dissolving into drifting ground mist; subtle double-exposure echo trailing behind. " +
+    "NOT overlapping or blocking the fountain. Clearly spectral, unsettling, and eerie.";
 }
 
         if (st.flags.has("candle_lit")) {
