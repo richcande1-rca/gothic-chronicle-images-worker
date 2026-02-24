@@ -182,6 +182,9 @@ export default {
 
         const st = parseState(state);
 
+        const roomKey = room.toLowerCase();
+        const isCourtyard = roomKey.includes("courtyard");
+
         // Base prompt
         let prompt =
           `Ultra realistic cinematic gothic horror. ` +
@@ -190,15 +193,15 @@ export default {
           `No text, no watermark, no modern objects. `;
 
         // ✅ Courtyard continuity anchor: ALWAYS include the fountain + landmarks
-        if (room.toLowerCase() === "courtyard") {
+        if (isCourtyard) {
           prompt +=
-            " Establishing features: a central cracked stone fountain is always present in the courtyard; " +
+            " Establishing features: the composition must clearly show a central cracked stone fountain as the main landmark (clearly visible, not obscured); " +
             "wet cobblestones, ivy-covered stone walls, weathered statues, wrought-iron gate in the distance; " +
             "keep the same layout and landmarks across renders; only mood/characters may change.";
         }
 
         // ✅ Courtyard ghost only, and make it unmistakable
-        if (room.toLowerCase() === "courtyard" && st.flags.has("courtyard_ghost_seen")) {
+        if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
           prompt +=
             " Include a tall pale ghostly apparition beside the central cracked stone fountain; " +
             "semi-transparent, subtle glow, Victorian haunting presence; " +
@@ -214,7 +217,7 @@ export default {
         //    Courtyard: keep composition stable across state changes
         //    Other rooms: allow state to influence composition (optional)
         let seedKey = `${room}::${seedParam}`;
-        if (room.toLowerCase() !== "courtyard") {
+        if (!isCourtyard) {
           seedKey = `${room}::${state}::${seedParam}`;
         }
         const seed = await seedFromText(seedKey);
