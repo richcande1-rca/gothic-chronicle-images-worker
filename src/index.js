@@ -204,15 +204,12 @@ export default {
 
 // Ghost positioning (SAFE ZONE — visible, not cropped, not centered)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
-  prompt +=
-    prompt +=
-  " A pale Victorian apparition stands left-of-center on the cobblestones between the fountain and the left statue. " +
-  "She is fully visible within the frame, separate from the fountain, not emerging from water. " +
-  "Her form is slender and human, partially translucent, with subtle fragmentation along the edges as if dissolving into the night air. " +
-  "The moonlight passes faintly through her figure. " +
-  "Her expression is unreadable, eyes dimly reflective rather than glowing, and her lower form softens into drifting mist near the ground. " +
-  "She feels ancient and sorrowful rather than theatrical. " +
-  "Maintain the centered fountain and full courtyard composition.";
+prompt +=
+  " Include TWO subjects: (1) the centered stone fountain, fully visible, and (2) a pale Victorian woman-apparition left-of-center on the cobblestones between the fountain and the left statue. " +
+  "The woman is fully inside the frame, full-body visible, separate from the fountain, not emerging from water. " +
+  "She wears tattered Victorian mourning attire (no sheet costume), her form partially translucent with moonlight faintly passing through. " +
+  "Edges subtly dissolve into mist near the ground; her eyes are dimly reflective (not cartoon-glowing). " +
+  "Gothic realism, cinematic moonlight, unsettling but elegant.";
 }
 
         if (st.flags.has("candle_lit")) {
