@@ -202,16 +202,16 @@ export default {
             "Keep consistent layout across renders.";
         }
 
-    // Ghost positioning (FOREGROND PRESENCE / CINEMATIC HORROR)
+// Ghost positioning (OFF-CENTER, REQUIRED, HIGH VISIBILITY)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
   prompt +=
-    " Add a CLEAR, FULL-BODY ghostly apparition positioned in the LEFT FOREGROUND, closer to the viewer than the fountain, " +
-    "standing partially turned toward the camera. The central fountain remains visible behind it. " +
-    "The figure is unmistakably supernatural: semi-transparent body with background faintly visible through it, " +
-    "cold pale glow not caused by moonlight, edges softly flickering and diffused. " +
-    "Face partially shadowed with faint luminous eyes watching the viewer; unnatural stillness. " +
-    "Lower body dissolving into drifting ground mist; subtle double-exposure echo trailing behind. " +
-    "NOT overlapping or blocking the fountain. Clearly spectral, unsettling, and eerie.";
+    " Add a CLEAR, FULL-BODY ghostly apparition that MUST be present as a secondary subject. " +
+    "Place the ghost on the LEFT side of the courtyard, in front of the left wall and near the left-side statue, " +
+    "closer to the viewer than the fountain. The ghost is OFF-CENTER and NOT aligned with the fountain or central arch. " +
+    "The fountain remains centered and fully visible, and the ghost must NOT emerge from water and must NOT touch the fountain. " +
+    "The ghost must be clearly visible and recognizable (head, torso, arms) with cold inner glow, translucent body, " +
+    "diffused flickering edges, faint luminous eyes, and lower body fading into mist. " +
+    "High contrast against the background. Do NOT omit the ghost.";
 }
 
         if (st.flags.has("candle_lit")) {
