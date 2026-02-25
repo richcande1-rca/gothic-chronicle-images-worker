@@ -205,7 +205,7 @@ export default {
 // Ghost positioning (SAFE ZONE — visible, not cropped, not centered)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
   prompt +=
-   " A clearly humanoid ethereal apparition is present " +
+   " An ethereal apparition is present " +
 " positioned clearly LEFT of the central fountain, " +
 " standing beside it and NOT emerging from it. " +
 " The figure has recognizable human proportions " +
