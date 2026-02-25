@@ -205,23 +205,16 @@ export default {
 // Ghost positioning (SAFE ZONE — visible, not cropped, not centered)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
   prompt +=
-    " An ethereal mist-like apparition is clearly present " +
-    " as a primary subject in the scene. " +
-    " The entity forms LEFT OF THE CENTRAL FOUNTAIN, " +
-    " appearing as swirling translucent energy attempting " +
-    " to coalesce into a human silhouette. " +
-    " It is NOT solid or fully human; " +
-    " more vapor, light, and unstable spectral motion. " +
-    " Moonlight passes through shifting layers of mist " +
-    " and faint luminous strands. " +
-    " The shape continuously forms and dissolves, " +
-    " as if struggling to regain human identity. " +
-    " No clear facial detail, only suggestion of form. " +
-    " Full apparition visible in frame, " +
-		" The apparition is soft drifting mist and flowing vapor, " +
-" NOT lightning or electrical energy, " +
-" moving slowly like breath in cold air. " +
-    " not cropped and not obscured. ";
+   " A clearly humanoid ethereal apparition is present " +
+" positioned clearly LEFT of the central fountain, " +
+" standing beside it and NOT emerging from it. " +
+" The figure has recognizable human proportions " +
+" including head, torso, arms, and legs, " +
+" but remains semi-transparent and incomplete. " +
+" Portions of the body dissolve into drifting luminous mist, " +
+" reforming in unstable flowing motion. " +
+" The apparition floats slightly above the ground, " +
+" separate from the fountain structure. " +
 
   if (st.flags.has("candle_lit")) {
     prompt +=
