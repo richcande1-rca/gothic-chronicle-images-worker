@@ -214,7 +214,7 @@ if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
 " Portions of the body dissolve into drifting luminous mist, " +
 " reforming in unstable flowing motion. " +
 " The apparition floats slightly above the ground, " +
-" separate from the fountain structure. " +
+" separate from the fountain structure. " ;
 
   if (st.flags.has("candle_lit")) {
     prompt +=
