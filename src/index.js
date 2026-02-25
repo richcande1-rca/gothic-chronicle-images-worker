@@ -209,7 +209,10 @@ if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
 " positioned clearly LEFT of the central fountain, " +
 " standing beside it and NOT emerging from it. " +
 " The figure has recognizable human proportions " +
-" including head, torso, arms, and legs, " +
+" The figure is NOT a smooth glowing body; " +
+" its form is uneven and incomplete, " +
+" composed of layered drifting mist and broken translucent strands. " +
+" Edges blur and fragment rather than forming a solid outline. " +
 " but remains semi-transparent and incomplete. " +
 " Portions of the body dissolve into drifting luminous mist, " +
 " reforming in unstable flowing motion. " +
