@@ -217,6 +217,8 @@ if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
 " No detailed facial features, only a faint hollow suggestion of a face. " +
 " The apparition appears to be struggling to remain cohesive. " +
 " Full figure visible in frame, not cropped and not obscured. ";
+	" The apparition is clearly NOT a statue or solid sculpture; " +
+" it appears suspended, shifting, and weightless above the fountain. " +
 
   if (st.flags.has("candle_lit")) {
     prompt +=
