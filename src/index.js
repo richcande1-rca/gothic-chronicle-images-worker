@@ -210,9 +210,9 @@ if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
 " standing beside it and NOT emerging from it. " +
 " The figure has recognizable human proportions " +
 " The figure is NOT a smooth glowing body; " +
-" its form is uneven and incomplete, " +
-" composed of layered drifting mist and broken translucent strands. " +
-" Edges blur and fragment rather than forming a solid outline. " +
+" its form is uneven and partially obscured by shifting mist. " +
+" Density varies across the body, with some areas nearly invisible. " +
+" Edges dissolve into vapor rather than forming a bright outline. " +
 " but remains semi-transparent and incomplete. " +
 " Portions of the body dissolve into drifting luminous mist, " +
 " reforming in unstable flowing motion. " +
