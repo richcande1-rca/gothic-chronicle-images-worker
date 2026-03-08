@@ -205,25 +205,45 @@ export default {
 // Ghost positioning (SAFE ZONE — visible, not cropped, not centered)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
   prompt +=
-   " An ethereal apparition is present " +
-" positioned clearly LEFT of the central fountain, " +
-" standing beside it and NOT emerging from it. " +
-" The figure has recognizable human proportions " +
-" The figure is NOT a smooth glowing body; " +
-" its form is uneven and partially obscured by shifting mist. " +
-" Density varies across the body, with some areas nearly invisible. " +
-" Edges dissolve into vapor rather than forming a bright outline. " +
-" but remains semi-transparent and incomplete. " +
-" Portions of the body dissolve into drifting luminous mist, " +
-" reforming in unstable flowing motion. " +
-" The apparition floats slightly above the ground, " +
-" separate from the fountain structure. " ;
+    " An ethereal mist-like apparition is clearly present " +
+    " as a primary subject in the scene. " +
+    " The entity forms LEFT OF THE CENTRAL FOUNTAIN, " +
+    " appearing as swirling translucent energy attempting " +
+    " to coalesce into a human silhouette. " +
+    " It is NOT solid or fully human; " +
+    " more vapor, light, and unstable spectral motion. " +
+    " Moonlight passes through shifting layers of mist " +
+    " and faint luminous strands. " +
+    " The shape continuously forms and dissolves, " +
+    " as if struggling to regain human identity. " +
+    " No clear facial detail, only suggestion of form. " +
+    " Full apparition visible in frame, " +
+    " not cropped and not obscured. ";
 
   if (st.flags.has("candle_lit")) {
     prompt +=
       " Add warm candlelight interacting with the mist, " +
       " creating subtle glowing highlights and deeper shadows. ";
   }
+}
+
+// Butcher positioning (SAFE ZONE — visible, not cropped, not centered)
+if (roomKey.includes("kitchen") && st.flags.has("butcher_seen")) {
+  prompt +=
+    " A sinister gothic butcher is clearly present " +
+    " as a primary subject in the scene. " +
+    " He stands slightly RIGHT OF CENTER near a wooden preparation block " +
+    " beneath the cold hearth, fully visible in frame, " +
+    " not cropped and not obscured. " +
+    " He is tall and broad-shouldered, wearing a dark butcher apron, " +
+    " with pale wax-like skin and an unreadable expression. " +
+    " His posture is calm, deliberate, and unsettling. " +
+    " One hand rests near a heavy cleaver or carving blade, " +
+    " but he is not attacking and not in an action pose. " +
+    " Hanging hooks, old iron tools, and shadowed kitchen details remain visible around him. " +
+    " The atmosphere should feel tense, cinematic, and deeply uncanny, " +
+    " as if he had been standing there silently for some time. " +
+    " No cartoon gore, no exaggerated slasher styling. ";
 }
 
         // 2) Deterministic seed
@@ -234,6 +254,9 @@ if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
   // new deterministic camera for the ghost moment
   seedKey = `${room}::${seedParam}::ghost`;
+} else if (roomKey.includes("kitchen") && st.flags.has("butcher_seen")) {
+  // new deterministic camera for the butcher moment
+  seedKey = `${room}::${seedParam}::butcher`;
 } else if (!isCourtyard) {
   seedKey = `${room}::${state}::${seedParam}`;
 }
