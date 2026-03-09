@@ -222,7 +222,7 @@ if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
     " She appears silent and motionless, watching from beside the cracked fountain. " +
     " The apparition must remain separate from the fountain and surrounding fog. " +
     " Full figure visible in frame, not cropped and not obscured. "
-		" Just a bit more ghostlike..less solid form, more glowing effect.;
+	" Just a bit more ghostlike..less solid form, more glowing effect.";
 
   if (st.flags.has("candle_lit")) {
     prompt +=
