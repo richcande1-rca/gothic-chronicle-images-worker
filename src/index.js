@@ -213,20 +213,20 @@ export default {
 // Ghost positioning (SAFE ZONE — visible, not cropped, not centered)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
   prompt +=
-    " A tall ghostly female apparition is clearly present as a primary subject in the scene. " +
-    " She stands beside the central fountain, slightly off-center, fully visible in frame. " +
-    " Her form is distinctly humanoid and upright, a pale translucent Victorian figure. " +
-    " Moonlight passes through her body, revealing the courtyard behind her through faint transparency. " +
-    " The silhouette is stable and recognizable as a woman, though facial details remain indistinct. " +
-    " Wisps of thin mist trail gently from the edges of her form, but the figure itself remains clearly defined. " +
-    " She appears silent and motionless, watching from beside the cracked fountain. " +
+    " A tall Victorian mourning spirit is clearly present as a primary subject in the scene. " +
+    " She stands beside the central cracked fountain, slightly off-center, fully visible in frame. " +
+    " Her form is a translucent human silhouette wearing aged 19th century mourning clothing. " +
+    " The garments appear dark, worn, and old rather than bright or bridal. " +
+    " The figure is pale and spectral, with moonlight passing through her body revealing the courtyard behind her. " +
+    " Her outline is stable and clearly humanoid, though facial features remain indistinct and shadowed. " +
+    " Thin wisps of mist trail from the edges of her form as if her body is slowly fading into the night air. " +
+    " She stands quietly beside the fountain as if remembering something long lost. " +
     " The apparition must remain separate from the fountain and surrounding fog. " +
-    " Full figure visible in frame, not cropped and not obscured. " +
-	" Just a bit more ghostlike..less solid form, more glowing effect.";
+    " Full figure visible in frame, not cropped and not obscured. ";
 
   if (st.flags.has("candle_lit")) {
     prompt +=
-      " Warm candlelight subtly illuminates the apparition, creating faint golden highlights along the edges of her translucent form while moonlight still passes through her body. ";
+      " Warm candlelight softly illuminates parts of the apparition, creating subtle amber highlights along the edges of her fading form while moonlight still passes through her translucent body. ";
   }
 }
 
