@@ -213,25 +213,19 @@ export default {
 // Ghost positioning (SAFE ZONE — visible, not cropped, not centered)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
   prompt +=
-    " An ethereal mist-like apparition is clearly present " +
-    " as a primary subject in the scene. " +
-    " The entity forms LEFT OF THE CENTRAL FOUNTAIN, " +
-    " appearing as swirling translucent energy attempting " +
-    " to coalesce into a human silhouette. " +
-    " It is NOT solid or fully human; " +
-    " more vapor, light, and unstable spectral motion. " +
-    " Moonlight passes through shifting layers of mist " +
-    " and faint luminous strands. " +
-    " The shape continuously forms and dissolves, " +
-    " as if struggling to regain human identity. " +
-    " No clear facial detail, only suggestion of form. " +
-    " Full apparition visible in frame, " +
-    " not cropped and not obscured. ";
+    " A tall ghostly female apparition is clearly present as a primary subject in the scene. " +
+    " She stands beside the central fountain, slightly off-center, fully visible in frame. " +
+    " Her form is distinctly humanoid and upright, a pale translucent Victorian figure. " +
+    " Moonlight passes through her body, revealing the courtyard behind her through faint transparency. " +
+    " The silhouette is stable and recognizable as a woman, though facial details remain indistinct. " +
+    " Wisps of thin mist trail gently from the edges of her form, but the figure itself remains clearly defined. " +
+    " She appears silent and motionless, watching from beside the cracked fountain. " +
+    " The apparition must remain separate from the fountain and surrounding fog. " +
+    " Full figure visible in frame, not cropped and not obscured. ";
 
   if (st.flags.has("candle_lit")) {
     prompt +=
-      " Add warm candlelight interacting with the mist, " +
-      " creating subtle glowing highlights and deeper shadows. ";
+      " Warm candlelight subtly illuminates the apparition, creating faint golden highlights along the edges of her translucent form while moonlight still passes through her body. ";
   }
 }
 
