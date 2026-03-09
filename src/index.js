@@ -202,6 +202,14 @@ export default {
             "Keep consistent layout across renders.";
         }
 
+        // Global candle lighting modifier
+        if (st.flags.has("candle_lit")) {
+          prompt +=
+            " Add warm candlelight and subtle amber highlights throughout the scene, " +
+            " with deeper shadow contrast, gentle practical-light glow, " +
+            " and richer illuminated details against the surrounding darkness. ";
+        }
+
 // Ghost positioning (SAFE ZONE — visible, not cropped, not centered)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
   prompt +=
