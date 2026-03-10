@@ -213,9 +213,9 @@ export default {
 // Ghost positioning (SAFE ZONE — visible, not cropped, not centered)
 if (isCourtyard && st.flags.has("courtyard_ghost_seen")) {
   prompt +=
-    " A tall Victorian mourning spirit is clearly present as a primary subject in the scene. " +
+    " A tall Victorian mourning ghost is clearly present as a primary subject in the scene. " +
     " She stands beside the central cracked fountain, slightly off-center, fully visible in frame. " +
-    " Her form is a translucent human silhouette." +
+    " Her form is a translucent human silhouette, surrounded by an ethereal mist." +
     " The figure is pale and spectral, with moonlight passing through her body revealing the courtyard behind her. " +
     " Her outline is stable and clearly humanoid, though facial features remain indistinct and shadowed. " +
     " Thin wisps of mist trail from the edges of her form as if her body is slowly fading into the night air. " +
